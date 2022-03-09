@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="sumo">
+
+  <xacro:include filename="$(find mybot)/urdf/wheel.xacro" />
+  <xacro:include filename="$(find mybot)/urdf/camera.xacro" />
+  
+  <xacro:property name="base_length" value=".15" />
+  
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="${base_length} .10 .05"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <box size=".15 .10 .05"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1"/>
+      <inertia ixx="0.21" ixy="0.00" ixz="0.00" iyy="0.27" iyz="0.00" izz="0.10"/>
+    </inertial>
+  </link>
+  
+  <xacro:wheel prefix="right" radius="0.05" reflect="1" />
+  <xacro:wheel prefix="left" radius="0.05" reflect="-1" />
+  <xacro:front_camera name = "camera" />
+  
+  <link name="back_wheel">
+    <visual>
+      <geometry>
+        <sphere radius="0.02"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.02"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1"/>
+      <inertia ixx="0.03" ixy="0.0" ixz="0.0" iyy="0.03" iyz="0.0" izz="0.03"/>
+    </inertial>
+  </link>
+  
+  <joint name="base_to_back_wheel" type="fixed">
+    <parent link="base_link"/>
+    <child link="back_wheel"/>
+    <origin rpy="0 0 0" xyz="-0.04 0.00 -0.02"/>
+  </joint>
+  
+  <gazebo reference="back_wheel">
+    <material>Gazebo/Blue</material>
+    <mu1>0.0</mu1>
+    <mu2>0.0</mu2>
+    <slip1>1.0</slip1>
+    <slip2>1.0</slip2>
+    <selfCollide>true</selfCollide>
+    <gravity>true</gravity>
+  </gazebo>
+  
+  <gazebo reference="base_link">
+    <material>Gazebo/White</material>
+    <mu1>0.0</mu1>
+    <mu2>0.0</mu2>
+    <selfCollide>true</selfCollide>
+    <gravity>true</gravity>
+  </gazebo>
+  
+  <!-- Add ROS plugin so we can interact with our robot -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/</robotNamespace>
+    </plugin>
+  </gazebo>
+</robot>
