@@ -35,14 +35,17 @@
 
   <!-- load multiple values stored in .yaml file into global parameters -->
   <!-- parameters store motor controller configurations -->
-  <rosparam command="load"
+  <rosparam command="load" 
             file="$(find mybot)/config/joints.yaml" />
   
   <!-- Spawn controllers -->
   <node name="sumo_controller_spawner"
         pkg="controller_manager"
         type="spawner"
-        args="joint_state_controller right_wheel_controller left_wheel_controller camera_controller" />
+        args="joint_state_controller 
+              right_wheel_controller 
+              left_wheel_controller 
+              camera_controller" />
+  <node name = "odom_pub" pkg = "mybot" type = "odom.py" output = "screen" />
+  <node name = "opencv_pub" pkg = "mybot" type = "opencv.py" output = "screen" />
 </launch>
-
-

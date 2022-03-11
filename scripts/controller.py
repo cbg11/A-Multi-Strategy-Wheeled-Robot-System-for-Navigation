@@ -1,13 +1,15 @@
 import rospy
 from nav_msgs.msg import Odometry
+from std_msgs.msg import String
 from tf.transformations import euler_from_quaternion
-from geometry_msgs.msg import Point, Twist
+from geometry_msgs.msg import Point
 from math import atan2
 
-x = 0.0
-y = 0.0 
-theta = 0.0
 
+x = 1.0
+y = 3.0
+theta = 0.0
+command = "STOP"
 def newOdom(msg):
     global x
     global y
@@ -22,28 +24,32 @@ def newOdom(msg):
 rospy.init_node("speed_controller")
 
 sub = rospy.Subscriber("/odom", Odometry, newOdom)
-pub = rospy.Publisher("/cmd_vel", Twist, queue_size = 1)
+pub = rospy.Publisher("/motor_commands", String, queue_size = 1)
 
-speed = Twist()
 
 r = rospy.Rate(4)
 
 goal = Point()
-goal.x = 5
-goal.y = 5
+goal.x = 2.0
+goal.y = 2.0
 
 while not rospy.is_shutdown():
-    inc_x = goal.x -x
-    inc_y = goal.y -y
+    inc_x = goal.x - x
+    inc_y = goal.y - y
 
     angle_to_goal = atan2(inc_y, inc_x)
 
-    if abs(angle_to_goal - theta) > 0.1:
-        speed.linear.x = 0.0
-        speed.angular.z = 0.3
+    angle = angle_to_goal - theta
+    if angle < -0.1 and command != "STOP":
+        command = "RIGHT"
+    elif angle > 0.1 and command != "STOP":
+        command = "LEFT"
     else:
-        speed.linear.x = 0.5
-        speed.angular.z = 0.0
+        command = "GO"
+    print(x, y)
+    if x >= (goal.x - 0.2) and y >= (goal.y - 0.2):
+        command = "STOP"
 
-    pub.publish(speed)
-    r.sleep()    
+
+    pub.publish(command)
+    r.sleep()
