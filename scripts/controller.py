@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import rospy
 import numpy as np
 from nav_msgs.msg import Odometry
@@ -152,7 +154,7 @@ r = rospy.Rate(4)
 goal = Point()
 
 goal.x = 6.5
-goal.y = 2.5
+goal.y = 3.0
 
 g_x = int(goal.x * 2)
 g_y = int(goal.y * 2)
