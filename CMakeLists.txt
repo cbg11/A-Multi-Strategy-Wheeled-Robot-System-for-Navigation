@@ -30,6 +30,6 @@ add_executable(motor_controller src/motor_controller.cpp)
 target_link_libraries(motor_controller
         ${catkin_LIBRARIES}
         )
-catkin_install_python(PROGRAMS scripts/talker.py scripts/listener.py
+catkin_install_python(PROGRAMS scripts/talker.py scripts/listener.py scripts/controller.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
