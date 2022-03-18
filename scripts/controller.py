@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
 import rospy
+import cv2
 import numpy as np
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge, CvBridgeError
 from tf.transformations import euler_from_quaternion
 from geometry_msgs.msg import Point
 from math import atan2
@@ -143,18 +146,32 @@ def newOdom(msg):
     rot_q = msg.pose.pose.orientation
     (roll, pitch, theta) = euler_from_quaternion([rot_q.x, rot_q.y, rot_q.z, rot_q.w])
 
+
+left = 0.0
+right = 0.0
+bridge = CvBridge()
+
+def img_controller(data):
+    global left
+    global right
+    cv_image = bridge.imgmsg_to_cv2(data, "bgr8")
+    cv_image = cv2.resize(cv_image, (400, 400)) 
+    gray_img  = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
+    left = gray_img[350][100]
+    right = gray_img[350][300]
+
 rospy.init_node("speed_controller")
 
 sub = rospy.Subscriber("/odom", Odometry, newOdom)
 pub = rospy.Publisher("/motor_commands", String, queue_size = 1)
-
+img_sub = rospy.Subscriber("/camera/image_raw", Image, img_controller)
 
 r = rospy.Rate(4)
 
 goal = Point()
 
-goal.x = 6.5
-goal.y = 3.0
+goal.x = #6.5
+goal.y = #3.0
 
 g_x = int(goal.x * 2)
 g_y = int(goal.y * 2)
@@ -181,7 +198,6 @@ while path:
     local_x = removed[0]
     local_y = removed[1]
     while not rospy.is_shutdown():
-        
         inc_x = local_x - x
         inc_y = local_y - y
 
@@ -189,17 +205,29 @@ while path:
 
         angle = angle_to_goal - theta
         if angle < -0.1 and command != "STOP":
-            command = "RIGHT"
+            if right > 100:
+                command = "LEFT"
+            else:
+                command = "RIGHT"
         elif angle > 0.1 and command != "STOP":
-            command = "LEFT"
+            if left > 100:
+                command = "RIGHT"
+            else:
+                command = "LEFT"
         else:
-            command = "GO"
+            if left and right > 100:
+                command = "STOP"
+            elif left > 100 and right < 100:
+                command = "RIGHT"
+            elif right > 100 and left < 100:
+                command = "LEFT"
+            else:
+                command = "GO"
         print(local_x, local_y)
         if x >= (local_x - 0.1) and x <= (local_x + 0.1) and y >= (local_y - 0.1) and y <= (local_y + 0.1):
             if not path:
                 command = "STOP"
                 pub.publish(command)
             break
-
         pub.publish(command)
         r.sleep()
