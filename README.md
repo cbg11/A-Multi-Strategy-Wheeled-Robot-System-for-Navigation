@@ -2,7 +2,7 @@
 
 Prepared by
  1. Chala Bekabil ([cbg11](https://github.com/cbg11))
- 2. Robbel Habtamu
+ 2. Robbel Habtamu ([R-hab](https://github.com/R-hab))
 
 ## Launch the robot
 
