@@ -1,7 +1,7 @@
 # A Multi-Strategy Wheeled Robot System for Navigation
 
 Prepared by
- 1. Chala Bekabil
+ 1. Chala Bekabil ([cbg11](https://github.com/cbg11))
  2. Robbel Habtamu
 
 ## Launch the robot
